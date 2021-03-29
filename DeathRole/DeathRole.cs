@@ -25,7 +25,7 @@ namespace DeathRole{
         
             Harmony.PatchAll();
             Logger = Log;
-            Logger.LogInfo("Mods is ready !");
+            Logger.LogInfo("DeathRole Mods is ready !");
         }
     }
 }
