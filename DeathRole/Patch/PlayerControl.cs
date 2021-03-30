@@ -1,14 +1,16 @@
-﻿using HarmonyLib;
-using System;
-using System.Diagnostics;
+using HarmonyLib;
 using UnityEngine;
 
 namespace DeathRole.Patch {
 
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetTasks))]
-    class TasksPatch {
-        /*public static void Postfix(PlayerControl __instance) {
-            if (PlayerControl.LocalPlayer != null) {
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
+    public static class PlayerUpdatePatch {
+        public static bool PlayerIsDead = false;
+
+        public static void Postfix(PlayerControl __instance) {
+            if (PlayerControl.LocalPlayer.Data.IsDead && !PlayerIsDead) {
+                PlayerIsDead = true;
+
                 if (HelperRole.AstralList != null && HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
                     ImportantTextTask ImportantTasks = new GameObject("AstralTasks").AddComponent<ImportantTextTask>();
                     ImportantTasks.transform.SetParent(__instance.transform, false);
@@ -16,6 +18,6 @@ namespace DeathRole.Patch {
                     __instance.myTasks.Insert(0, ImportantTasks);
                 }
             }
-        }*/
+        }
     }
 }
