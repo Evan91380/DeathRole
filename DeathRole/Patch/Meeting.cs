@@ -62,14 +62,6 @@ namespace DeathRole.Patch {
                     }
 
                 }
-                if (HelperRole.IsAstral(srcPlayerId))
-                {
-                    foreach (PlayerVoteArea player in __instance.playerStates)
-                    {
-                        if(player.TargetPlayerId == srcPlayerId)
-                            player.Background.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
-                    }
-                }
                 
             }
 
