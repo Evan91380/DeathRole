@@ -1,6 +1,6 @@
 namespace DeathRole {
     public enum CustomRPC {
-        SetAstral = 80
+        SetSpirit = 80
     }
 
     public enum NormalRPC {

@@ -11,12 +11,12 @@ namespace DeathRole.Patch {
     class HandleRpcPatch {
 
         public static bool Prefix([HarmonyArgument(0)] byte CallId, [HarmonyArgument(1)] MessageReader reader) {
-            if (CallId == (byte) CustomRPC.SetAstral) {
-                HelperRole.AstralList.Clear();
+            if (CallId == (byte) CustomRPC.SetSpirit) {
+                HelperRole.SpiritList.Clear();
                 List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
 
                 for (int i = 0; i < selectedPlayers.Count; i++) {
-                    HelperRole.AstralList.Add(PlayerControlUtils.FromPlayerId(selectedPlayers[i]));
+                    HelperRole.SpiritList.Add(PlayerControlUtils.FromPlayerId(selectedPlayers[i]));
                 }
 
                 return false;

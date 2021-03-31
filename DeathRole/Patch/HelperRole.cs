@@ -3,22 +3,22 @@ using UnityEngine;
 
 namespace DeathRole.Patch {
     public static class HelperRole {
-        public static List<PlayerControl> AstralList = new List<PlayerControl>();
+        public static List<PlayerControl> SpiritList = new List<PlayerControl>();
 
-        public static bool IsAstral(byte playerId) {
-            bool IsAstral = false;
+        public static bool IsSpirit(byte playerId) {
+            bool IsSpirit = false;
 
-            if (AstralList != null)
-                for (int i = 0; i < AstralList.Count; i++)
-                    if (playerId == AstralList[i].PlayerId)
-                        IsAstral = true;
+            if (SpiritList != null)
+                for (int i = 0; i < SpiritList.Count; i++)
+                    if (playerId == SpiritList[i].PlayerId)
+                        IsSpirit = true;
 
-            return IsAstral;
+            return IsSpirit;
         }
 
         public static void ClearRoles() {
-            if (AstralList != null && AstralList.Count > 0)
-                AstralList.Clear();
+            if (SpiritList != null && SpiritList.Count > 0)
+                SpiritList.Clear();
         }
     }
 }

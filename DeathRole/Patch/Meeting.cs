@@ -14,16 +14,16 @@ namespace DeathRole.Patch {
 
     [HarmonyPatch]
     public static class MeetingHudPopulateButtonsPatch {
-        public static bool AstralHasVoted = false;
+        public static bool SpiritHasVoted = false;
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
         class MeetingUpdatePatch
         {
             static void Prefix(MeetingHud __instance)
             {
-                if (HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
+                if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
-                    if (!AstralHasVoted && __instance.discussionTimer == 0)
+                    if (!SpiritHasVoted && __instance.discussionTimer == 0)
                     {
                         //__instance.SkipVoteButton.SetEnabled();
                         __instance.SkipVoteButton.gameObject.SetActive(true);
@@ -36,7 +36,7 @@ namespace DeathRole.Patch {
         class MeetingVotePatch {
 
             static void Prefix(MeetingHud __instance, [HarmonyArgument(0)] sbyte suspectIdx) {
-               if(HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
+               if(HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
 
                     __instance.CmdCastVote(PlayerControl.LocalPlayer.PlayerId, suspectIdx);
                }
@@ -49,7 +49,7 @@ namespace DeathRole.Patch {
         {
             static void Prefix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId, [HarmonyArgument(1)] sbyte suspectPlayerId)
             {
-                if (HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
+                if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
                     foreach (PlayerVoteArea player in __instance.playerStates)
                     {
@@ -71,19 +71,19 @@ namespace DeathRole.Patch {
         class CastVoteNormal
         {
             static void Prefix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId, [HarmonyArgument(1)] sbyte suspectPlayerId)  {
-                if (HelperRole.IsAstral(srcPlayerId) && PlayerControlUtils.FromPlayerId(srcPlayerId).Data.IsDead) {
+                if (HelperRole.IsSpirit(srcPlayerId) && PlayerControlUtils.FromPlayerId(srcPlayerId).Data.IsDead) {
 
                     foreach (PlayerVoteArea player in __instance.playerStates)
                     {
                         if (player.TargetPlayerId == srcPlayerId)
                         {
-                            if (!DeathRole.CanVoteMultipleTime.GetValue() && !AstralHasVoted)
+                            if (!DeathRole.CanVoteMultipleTime.GetValue() && !SpiritHasVoted)
                             {
                                 player.didVote = true;
                                 player.votedFor = suspectPlayerId;
                                 //player.Flag.enabled = true;
 
-                                AstralHasVoted = true;
+                                SpiritHasVoted = true;
                             }
                             else if (DeathRole.CanVoteMultipleTime.GetValue())
                             {
@@ -103,14 +103,14 @@ namespace DeathRole.Patch {
         {
             static void Prefix(PlayerVoteArea __instance)
             {
-                if (HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)  {
+                if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)  {
                     MeetingHud MeetingInstance = __instance.Parent;
 
                     foreach (PlayerVoteArea player in MeetingInstance.playerStates) {
                         player.Buttons.SetActive(false);
                     }
                     
-                    if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && !MeetingInstance.DidVote(PlayerControl.LocalPlayer.PlayerId) && !AstralHasVoted)
+                    if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && !MeetingInstance.DidVote(PlayerControl.LocalPlayer.PlayerId) && !SpiritHasVoted)
                          __instance.Buttons.SetActive(true);
                 }
             }
@@ -121,7 +121,7 @@ namespace DeathRole.Patch {
         {
             static bool Prefix(ref byte __result, PlayerVoteArea __instance)
             {
-                if (HelperRole.IsAstral((byte) __instance.TargetPlayerId) && __instance.isDead && __instance.didVote)
+                if (HelperRole.IsSpirit((byte) __instance.TargetPlayerId) && __instance.isDead && __instance.didVote)
                 {
                     __result = (byte)((int)(__instance.votedFor + 1 & 15) | (0) | (__instance.didVote ? 64 : 0) | (__instance.didReport ? 32 : 0));
                     return false;

@@ -9,7 +9,7 @@ namespace DeathRole.Patch {
                 if (PlayerControl.AllPlayerControls != null && PlayerControl.AllPlayerControls.Count > 1) {
                     if (PlayerControl.LocalPlayer != null) {                    
                         foreach (var playerControl in PlayerControl.AllPlayerControls) {
-                            if (HelperRole.IsAstral(playerControl.PlayerId) && playerControl.Data.IsDead && PlayerControl.LocalPlayer.Data.IsDead) {
+                            if (HelperRole.IsSpirit(playerControl.PlayerId) && playerControl.Data.IsDead && PlayerControl.LocalPlayer.Data.IsDead) {
                                 string playerName = playerControl.Data.PlayerName;
 
                                 if (playerName == player.NameText.Text)
@@ -31,7 +31,7 @@ namespace DeathRole.Patch {
             if (PlayerControl.LocalPlayer != null) {
                 if (PlayerControl.AllPlayerControls != null && PlayerControl.AllPlayerControls.Count > 1) {
                     foreach (var playerControl in PlayerControl.AllPlayerControls) {
-                        if (HelperRole.IsAstral(playerControl.PlayerId) && playerControl.Data.IsDead && PlayerControl.LocalPlayer.Data.IsDead) {
+                        if (HelperRole.IsSpirit(playerControl.PlayerId) && playerControl.Data.IsDead && PlayerControl.LocalPlayer.Data.IsDead) {
                             playerControl.nameText.Color = new Color(0.749f, 0f, 0.839f, 1f);
                         }
                     }

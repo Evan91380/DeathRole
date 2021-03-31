@@ -14,18 +14,17 @@ namespace DeathRole.Patch {
             //List<PlayerControl> crewmateList = playersList.FindAll(x => !x.Data.IsImpostor).ToArray().ToList();
             HelperRole.ClearRoles();
 
-            // Astral
 
             int randomtkt = new Random().Next(0, 100);
 
-            if (playersList != null && playersList.Count > 0 && DeathRole.EnableAstral.GetValue() >= randomtkt) {
-                MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SetAstral, SendOption.None, -1);
+            if (playersList != null && playersList.Count > 0 && DeathRole.EnableSpirit.GetValue() >= randomtkt) {
+                MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SetSpirit, SendOption.None, -1);
                 List<byte> playerSelected = new List<byte>();
 
-                for (int i = 0; i < DeathRole.NumberAstral.GetValue(); i++) {
+                for (int i = 0; i < DeathRole.NumberSpirit.GetValue(); i++) {
                     Random random = new Random();
                     PlayerControl selectedPlayer = playersList[random.Next(0, playersList.Count)];
-                    HelperRole.AstralList.Add(selectedPlayer);
+                    HelperRole.SpiritList.Add(selectedPlayer);
                     playersList.Remove(selectedPlayer);
                     playerSelected.Add(selectedPlayer.PlayerId);
                     DeathRole.Logger.LogInfo($"Player:  {selectedPlayer.nameText.Text}");

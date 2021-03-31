@@ -11,8 +11,8 @@ namespace DeathRole.Patch {
             if (PlayerControl.LocalPlayer.Data.IsDead && !PlayerIsDead) {
                 PlayerIsDead = true;
 
-                if (HelperRole.AstralList != null && HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
-                    ImportantTextTask ImportantTasks = new GameObject("AstralTasks").AddComponent<ImportantTextTask>();
+                if (HelperRole.SpiritList != null && HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
+                    ImportantTextTask ImportantTasks = new GameObject("SpiritTasks").AddComponent<ImportantTextTask>();
                     ImportantTasks.transform.SetParent(__instance.transform, false);
                     ImportantTasks.Text = "[5b00C2FF]You can vote while being dead![]";
                     __instance.myTasks.Insert(0, ImportantTasks);
