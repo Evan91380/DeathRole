@@ -8,6 +8,7 @@ using UnityEngine;
 using System.Linq;
 using InnerNet;
 using DeathRole.Utility;
+using UnhollowerBaseLib;
 
 namespace DeathRole.Patch {
 
@@ -30,14 +31,11 @@ namespace DeathRole.Patch {
             {
                 if (HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
-                    if (!__instance.DidVote(PlayerControl.LocalPlayer.Data.PlayerId) && __instance.discussionTimer == 0)
+                    if (!AstralHasVoted && __instance.discussionTimer == 0)
                     {
                         //__instance.SkipVoteButton.SetEnabled();
                         __instance.SkipVoteButton.gameObject.SetActive(true);
                     }
-
-                        
-
                 }
             }
         }
@@ -52,6 +50,7 @@ namespace DeathRole.Patch {
                }
             }
         }
+
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CmdCastVote))]
         class CmdCastVotePatch
@@ -71,6 +70,15 @@ namespace DeathRole.Patch {
                     }
 
                 }
+                if (HelperRole.IsAstral(srcPlayerId))
+                {
+                    foreach (PlayerVoteArea player in __instance.playerStates)
+                    {
+                        if(player.TargetPlayerId == srcPlayerId)
+                            player.Background.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+                    }
+                }
+                
             }
 
         }
@@ -124,5 +132,24 @@ namespace DeathRole.Patch {
             }
         }
 
+        [HarmonyPatch(typeof(PlayerVoteArea), nameof(PlayerVoteArea.GetState))]
+        class GetStatePatch
+        {
+            static bool Prefix(ref byte __result, PlayerVoteArea __instance)
+            {
+                if (HelperRole.IsAstral((byte) __instance.TargetPlayerId) && __instance.isDead && __instance.didVote)
+                {
+                    __result = (byte)((int)(__instance.votedFor + 1 & 15) | (0) | (__instance.didVote ? 64 : 0) | (__instance.didReport ? 32 : 0));
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
     }
 }
+
+
+
+
