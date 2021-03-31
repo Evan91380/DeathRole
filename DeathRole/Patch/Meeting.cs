@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using System.Linq;
 using InnerNet;
+using DeathRole.Utility;
 
 namespace DeathRole.Patch {
 
@@ -18,13 +19,31 @@ namespace DeathRole.Patch {
         class MeetingServerStartPatch {
             static void Prefix(MeetingHud __instance) {
                if(HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
-                    
-               }
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
+        class MeetingUpdatePatch
+        {
+            static void Prefix(MeetingHud __instance)
+            {
+                if (HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
+                {
+                    if (!__instance.DidVote(PlayerControl.LocalPlayer.Data.PlayerId) && __instance.discussionTimer == 0)
+                    {
+                        //__instance.SkipVoteButton.SetEnabled();
+                        __instance.SkipVoteButton.gameObject.SetActive(true);
+                    }
+
+                        
+
+                }
             }
         }
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Confirm))]
-        class MeetingEndPatch {
+        class MeetingVotePatch {
 
             static void Prefix(MeetingHud __instance, [HarmonyArgument(0)] sbyte suspectIdx) {
                if(HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
@@ -41,9 +60,16 @@ namespace DeathRole.Patch {
             {
                 if (HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
-                    DeathRole.Logger.LogInfo("CmbCastVote");
+                    foreach (PlayerVoteArea player in __instance.playerStates)
+                    {
+                        player.ClearButtons();
+                        __instance.SkipVoteButton.gameObject.SetActive(false);
+                        if (player.TargetPlayerId == PlayerControl.LocalPlayer.Data.PlayerId){
+                        player.didVote = true;
+                        player.votedFor = suspectPlayerId;
+                        }
+                    }
 
-                   
                 }
             }
 
@@ -53,20 +79,17 @@ namespace DeathRole.Patch {
         class CastVoteNormal
         {
             static void Prefix(MeetingHud __instance, [HarmonyArgument(0)] byte srcPlayerId, [HarmonyArgument(1)] sbyte suspectPlayerId)  {
-                if (HelperRole.IsAstral(srcPlayerId)) {
-                    DeathRole.Logger.LogInfo("CastVote");
+                if (HelperRole.IsAstral(srcPlayerId) && PlayerControlUtils.FromPlayerId(srcPlayerId).Data.IsDead) {
 
                     foreach (PlayerVoteArea player in __instance.playerStates)
                     {
                         if (player.TargetPlayerId == srcPlayerId)
                         {
-                            if (DeathRole.CanVoteMultipleTime.GetValue() == false && !AstralHasVoted)
+                            if (!DeathRole.CanVoteMultipleTime.GetValue() && !AstralHasVoted)
                             {
-                                DeathRole.Logger.LogInfo("Pas encore voté : " + player.votedFor);
                                 player.didVote = true;
                                 player.votedFor = suspectPlayerId;
-                                player.Flag.enabled = true;
-                                DeathRole.Logger.LogInfo("Vote pour : " + player.votedFor);
+                                //player.Flag.enabled = true;
 
                                 AstralHasVoted = true;
                             }
@@ -74,8 +97,7 @@ namespace DeathRole.Patch {
                             {
                                 player.didVote = true;
                                 player.votedFor = suspectPlayerId;
-                                player.Flag.enabled = true;
-                                DeathRole.Logger.LogInfo("Vote pours : " + player.votedFor);
+                                //player.Flag.enabled = true;
                             }
 
                         }
@@ -96,8 +118,7 @@ namespace DeathRole.Patch {
                         player.Buttons.SetActive(false);
                     }
                     
-                    DeathRole.Logger.LogInfo("select");
-                    if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && __instance.didVote != true)
+                    if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && !MeetingInstance.DidVote(PlayerControl.LocalPlayer.PlayerId) && !AstralHasVoted)
                          __instance.Buttons.SetActive(true);
                 }
             }

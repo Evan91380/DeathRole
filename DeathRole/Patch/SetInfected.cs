@@ -17,10 +17,8 @@ namespace DeathRole.Patch {
             // Astral
 
             int randomtkt = new Random().Next(0, 100);
-            DeathRole.Logger.LogInfo(DeathRole.EnableAstral.GetValue() + " et le random donne " + randomtkt);
 
             if (playersList != null && playersList.Count > 0 && DeathRole.EnableAstral.GetValue() >= randomtkt) {
-                DeathRole.Logger.LogInfo("ROLE DONNER");
                 MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SetAstral, SendOption.None, -1);
                 List<byte> playerSelected = new List<byte>();
 
