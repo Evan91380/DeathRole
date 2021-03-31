@@ -15,14 +15,6 @@ namespace DeathRole.Patch {
     [HarmonyPatch]
     public static class MeetingHudPopulateButtonsPatch {
         public static bool AstralHasVoted = false;
-        
-        [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Awake))]
-        class MeetingServerStartPatch {
-            static void Prefix(MeetingHud __instance) {
-               if(HelperRole.IsAstral(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead) {
-                }
-            }
-        }
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
         class MeetingUpdatePatch
