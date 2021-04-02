@@ -22,7 +22,7 @@ namespace DeathRole.Patch {
     public static class EndGameCommons {
         public static void ResetGlobalVariable() {
             PlayerUpdatePatch.PlayerIsDead = false;
-            MeetingHudPopulateButtonsPatch.SpiritHasVoted = false;
+            MeetingHudPopulateButtonsPatch.SpiritHasVoteds.Clear();
         }
     }
 }

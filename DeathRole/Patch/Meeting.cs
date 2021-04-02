@@ -14,7 +14,7 @@ namespace DeathRole.Patch {
 
     [HarmonyPatch]
     public static class MeetingHudPopulateButtonsPatch {
-        public static bool SpiritHasVoted = false;
+        public static List<bool> SpiritHasVoteds = new List<bool>(10);
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
         class MeetingUpdatePatch
@@ -23,7 +23,7 @@ namespace DeathRole.Patch {
             {
                 if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
-                    if (!SpiritHasVoted && __instance.discussionTimer == 0)
+                    if (!SpiritHasVoteds[PlayerControl.LocalPlayer.PlayerId] && __instance.discussionTimer == 0)
                     {
                         //__instance.SkipVoteButton.SetEnabled();
                         __instance.SkipVoteButton.gameObject.SetActive(true);
@@ -31,7 +31,6 @@ namespace DeathRole.Patch {
                 }
             }
         }
-
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Confirm))]
         class MeetingVotePatch {
 
@@ -43,6 +42,22 @@ namespace DeathRole.Patch {
             }
         }
 
+        [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CalculateVotes))]
+        class CalculateVotePatch
+        {
+            static void Prefix(MeetingHud __instance)
+            {
+                if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
+                {
+                    foreach (PlayerVoteArea player in __instance.playerStates)
+                    {
+                        player.ClearButtons();
+                        __instance.SkipVoteButton.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
+
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CmdCastVote))]
         class CmdCastVotePatch
@@ -51,20 +66,19 @@ namespace DeathRole.Patch {
             {
                 if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
+                    if (!DeathRole.CanVoteMultipleTime.GetValue() && !SpiritHasVoteds[srcPlayerId])
+                        SpiritHasVoteds[srcPlayerId] = true;
                     foreach (PlayerVoteArea player in __instance.playerStates)
                     {
                         player.ClearButtons();
                         __instance.SkipVoteButton.gameObject.SetActive(false);
-                        if (player.TargetPlayerId == PlayerControl.LocalPlayer.Data.PlayerId){
-                        player.didVote = true;
-                        player.votedFor = suspectPlayerId;
+                        if (player.TargetPlayerId == PlayerControl.LocalPlayer.Data.PlayerId) {
+                            player.didVote = true;
+                            player.votedFor = suspectPlayerId;
                         }
                     }
-
                 }
-                
             }
-
         }
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CastVote))]
@@ -77,13 +91,13 @@ namespace DeathRole.Patch {
                     {
                         if (player.TargetPlayerId == srcPlayerId)
                         {
-                            if (!DeathRole.CanVoteMultipleTime.GetValue() && !SpiritHasVoted)
+                            if (!DeathRole.CanVoteMultipleTime.GetValue() && !SpiritHasVoteds[srcPlayerId])
                             {
                                 player.didVote = true;
                                 player.votedFor = suspectPlayerId;
                                 //player.Flag.enabled = true;
 
-                                SpiritHasVoted = true;
+                                SpiritHasVoteds[srcPlayerId] = true;
                             }
                             else if (DeathRole.CanVoteMultipleTime.GetValue())
                             {
@@ -91,7 +105,6 @@ namespace DeathRole.Patch {
                                 player.votedFor = suspectPlayerId;
                                 //player.Flag.enabled = true;
                             }
-
                         }
                     }
                 }
@@ -106,11 +119,12 @@ namespace DeathRole.Patch {
                 if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)  {
                     MeetingHud MeetingInstance = __instance.Parent;
 
-                    foreach (PlayerVoteArea player in MeetingInstance.playerStates) {
+                    foreach (PlayerVoteArea player in MeetingInstance.playerStates)
                         player.Buttons.SetActive(false);
-                    }
+
+                    MeetingInstance.SkipVoteButton.gameObject.SetActive(false);
                     
-                    if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && !MeetingInstance.DidVote(PlayerControl.LocalPlayer.PlayerId) && !SpiritHasVoted)
+                    if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && !MeetingInstance.DidVote(PlayerControl.LocalPlayer.PlayerId) && !SpiritHasVoteds[PlayerControl.LocalPlayer.PlayerId])
                          __instance.Buttons.SetActive(true);
                 }
             }
@@ -121,7 +135,7 @@ namespace DeathRole.Patch {
         {
             static bool Prefix(ref byte __result, PlayerVoteArea __instance)
             {
-                if (HelperRole.IsSpirit((byte) __instance.TargetPlayerId) && __instance.isDead && __instance.didVote)
+                if (HelperRole.IsSpirit((byte) __instance.TargetPlayerId) && __instance.isDead && __instance.didVote && PlayerControl.GameOptions.AnonymousVotes)
                 {
                     __result = (byte)((int)(__instance.votedFor + 1 & 15) | (0) | (__instance.didVote ? 64 : 0) | (__instance.didReport ? 32 : 0));
                     return false;

@@ -22,12 +22,14 @@ namespace DeathRole.Patch {
                 List<byte> playerSelected = new List<byte>();
 
                 for (int i = 0; i < DeathRole.NumberSpirit.GetValue(); i++) {
-                    Random random = new Random();
-                    PlayerControl selectedPlayer = playersList[random.Next(0, playersList.Count)];
-                    HelperRole.SpiritList.Add(selectedPlayer);
-                    playersList.Remove(selectedPlayer);
-                    playerSelected.Add(selectedPlayer.PlayerId);
-                    DeathRole.Logger.LogInfo($"Player:  {selectedPlayer.nameText.Text}");
+                    if (playersList != null && playersList.Count > 0) {
+                        Random random = new Random();
+                        PlayerControl selectedPlayer = playersList[random.Next(0, playersList.Count)];
+                        HelperRole.SpiritList.Add(selectedPlayer);
+                        playersList.Remove(selectedPlayer);
+                        playerSelected.Add(selectedPlayer.PlayerId);
+                        DeathRole.Logger.LogInfo($"Player:  {selectedPlayer.nameText.Text}");
+                    }
                 }
 
                 messageWriter.WriteBytesAndSize(playerSelected.ToArray());
