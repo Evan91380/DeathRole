@@ -21,11 +21,14 @@ namespace DeathRole.Patch {
         {
             static void Prefix(MeetingHud __instance)
             {
+                if(__instance.discussionTimer == 0 && SpiritHasVoteds.Count < PlayerControl.AllPlayerControls.ToArray().ToList().Count)
+                    SpiritHasVoteds.AddRange(Enumerable.Repeat(default(bool), PlayerControl.AllPlayerControls.ToArray().ToList().Count - SpiritHasVoteds.Count));
+
+
                 if (HelperRole.IsSpirit(PlayerControl.LocalPlayer.PlayerId) && PlayerControl.LocalPlayer.Data.IsDead)
                 {
                     if (!SpiritHasVoteds[PlayerControl.LocalPlayer.PlayerId] && __instance.discussionTimer == 0)
                     {
-                        //__instance.SkipVoteButton.SetEnabled();
                         __instance.SkipVoteButton.gameObject.SetActive(true);
                     }
                 }
