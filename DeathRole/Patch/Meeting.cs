@@ -45,7 +45,7 @@ namespace DeathRole.Patch {
             }
         }
 
-        [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CalculateVotes))]
+      /*  [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CalculateVotes))]
         class CalculateVotePatch
         {
             static void Prefix(MeetingHud __instance)
@@ -59,7 +59,7 @@ namespace DeathRole.Patch {
                     }
                 }
             }
-        }
+        }*/
 
 
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CmdCastVote))]
@@ -125,10 +125,12 @@ namespace DeathRole.Patch {
                     foreach (PlayerVoteArea player in MeetingInstance.playerStates)
                         player.Buttons.SetActive(false);
 
-                    MeetingInstance.SkipVoteButton.gameObject.SetActive(false);
+                    //MeetingInstance.SkipVoteButton.gameObject.SetActive(false);
                     
                     if (!__instance.isDead && __instance.Parent.state != MeetingHud.VoteStates.Discussion && !MeetingInstance.DidVote(PlayerControl.LocalPlayer.PlayerId) && !SpiritHasVoteds[PlayerControl.LocalPlayer.PlayerId])
+                    {
                          __instance.Buttons.SetActive(true);
+                    }
                 }
             }
         }
